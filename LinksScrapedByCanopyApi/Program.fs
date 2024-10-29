@@ -24,7 +24,7 @@ module Program =
     [<EntryPoint>]
     let main args =
 
-        let apiKey = "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"  
+        let apiKey = ""  
 
         let validateApiKey (next: HttpFunc) (ctx: HttpContext) =  //GIRAFFE
                      
@@ -52,7 +52,7 @@ module Program =
             application
                 {
                     use_router apiRouter
-                    url "http://natalie.somee.com/api"
+                    url "http://kodis.somee.com/api"
                     memory_cache
                     use_static "static"
                     use_gzip

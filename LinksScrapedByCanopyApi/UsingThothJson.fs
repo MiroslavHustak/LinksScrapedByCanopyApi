@@ -118,12 +118,12 @@ module ThothJson =
                          try
                              match saveJsonString body path with
                              | Ok _      ->
-                                          let responseJson = Encode.toString 2 (encoderPut { Message = "Successfully updated" })
+                                          let responseJson = Encode.toString 2 (encoderPut { Message1 = "Successfully updated"; Message2 = String.Empty })
                                           ctx.Response.ContentType <- "application/json" 
     
                                           return! text responseJson next ctx  |> Async.AwaitTask  //GIRAFFE
                              | Error err ->   
-                                          let responseJson = Encode.toString 2 (encoderPut { Message = err })
+                                          let responseJson = Encode.toString 2 (encoderPut { Message1 = String.Empty; Message2 = err })
                                           ctx.Response.ContentType <- "application/json"
                                           ctx.Response.StatusCode <- 404
 

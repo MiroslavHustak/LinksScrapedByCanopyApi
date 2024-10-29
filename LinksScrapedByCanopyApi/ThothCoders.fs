@@ -14,7 +14,8 @@ type ResponseGet =
 
 type ResponsePut = 
     {
-        Message : string
+        Message1 : string
+        Message2 : string
     }
 
 module ThothCoders =   
@@ -35,5 +36,6 @@ module ThothCoders =
         
         Encode.object
             [
-                "Message", Encode.string result.Message    
+                "Message1", Encode.string result.Message1 
+                "Message2", Encode.string result.Message2
             ]
