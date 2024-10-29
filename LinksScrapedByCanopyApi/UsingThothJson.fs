@@ -5,8 +5,6 @@
 open Thoth.Json
 #else
 open Thoth.Json.Net
-open MyFsToolkit.Builders
-open MyFsToolkit
 #endif
 
 //Templates -> try-with blocks and Option/Result to be added when used in production
@@ -28,6 +26,9 @@ module ThothJson =
 
     open Helpers
     open ThothCoders
+
+    open MyFsToolkit
+    open MyFsToolkit.Builders
 
     let private path = "CanopyResults/canopy_results.json"
     
@@ -54,7 +55,7 @@ module ThothJson =
                         let! _ = reader |> Option.ofNull, Error (sprintf "%s%s" "Chyba při čtení dat ze souboru " filepath) 
                 
                         let jsonString = reader.ReadToEnd()
-                        let! jsonString = json |> Option.ofNullEmpty, Error (sprintf "%s%s" "Chyba při čtení dat ze souboru " filepath)                      
+                        let! jsonString = jsonString |> Option.ofNullEmpty, Error (sprintf "%s%s" "Chyba při čtení dat ze souboru " filepath)                      
                                   
                         return Ok jsonString //Thoth output is of Result type 
                     }
@@ -79,7 +80,6 @@ module ThothJson =
                      let responseJson = Encode.toString 2 (encoderGet response) 
                      ctx.Response.ContentType <- "application/json"
 
-                     // Return the response
                      return! text responseJson next ctx |> Async.AwaitTask  //GIRAFFE
                  }
              |> Async.StartImmediateAsTask 
@@ -88,24 +88,24 @@ module ThothJson =
     // ************** PUT *******************
    
     let internal putHandler : HttpHandler =   //GIRAFFE
+              
+        let saveJsonString (jsonString : string) path =
+            
+                try
+                    pyramidOfDoom
+                        {
+                            let filepath = Path.GetFullPath path |> Option.ofNullEmpty 
+                            let! filepath = filepath, Error (sprintf "%s%s" "Chyba při čtení cesty k souboru " path)
+                                    
+                            use writer = new StreamWriter(filepath, false)                
+                            let! _ = writer |> Option.ofNull, Error (sprintf "%s%s" "Chyba při serializaci do " path)
 
-        let saveJsonString (json : string) path =
-        
-            try
-                pyramidOfDoom
-                    {
-                        let filepath = Path.GetFullPath path |> Option.ofNullEmpty 
-                        let! filepath = filepath, Error (sprintf "%s%s" "Chyba při čtení cesty k souboru " path)
-    
-                        use writer = new StreamWriter(filepath, false)                
-                        let! _ = writer |> Option.ofNull, Error (sprintf "%s%s" "Chyba při serializaci do " path)
+                            writer.Write jsonString
 
-                        writer.Write json
-
-                        return Ok ()
-                    }
-            with
-            | ex -> Error (string ex.Message)
+                            return Ok ()
+                        }
+                with
+                | ex -> Error (string ex.Message)
 
         fun (next : HttpFunc) (ctx : HttpContext)   //GIRAFFE
             ->
@@ -118,21 +118,16 @@ module ThothJson =
                          try
                              match saveJsonString body path with
                              | Ok _      ->
-                                          let response = "Successfully updated" 
-                                      
-                                          let responseText = Encode.toString 2 (encoderPut response)
+                                          let responseJson = Encode.toString 2 (encoderPut { Message = "Successfully updated" })
                                           ctx.Response.ContentType <- "application/json" 
     
-                                          return! text responseText next ctx  |> Async.AwaitTask  //GIRAFFE
-
-                             | Error err ->                         
-                                          let response = err
-    
-                                          let responseText = Encode.toString 2 (encoderPut response)
+                                          return! text responseJson next ctx  |> Async.AwaitTask  //GIRAFFE
+                             | Error err ->   
+                                          let responseJson = Encode.toString 2 (encoderPut { Message = err })
                                           ctx.Response.ContentType <- "application/json"
                                           ctx.Response.StatusCode <- 404
 
-                                          return! text responseText next ctx |> Async.AwaitTask //GIRAFFE
+                                          return! text responseJson next ctx |> Async.AwaitTask //GIRAFFE
                          finally
                              reader.Dispose() 
                      with

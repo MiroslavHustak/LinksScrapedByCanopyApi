@@ -43,8 +43,8 @@ module Program =
             router
                 { 
                     pipe_through validateApiKey //...for every request
-                    get "/" getHandler   
-                    put "/user" putHandler                 
+                    get "/" getHandler   //anebo /user atd.
+                    put "/" putHandler //anebo /user atd.              
                 }
 
         let app =  //SATURN
@@ -61,3 +61,32 @@ module Program =
         run app //SATURN
 
         0
+
+(*
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+		<!-- Hosting model for ASP.NET Core -->
+		<OutputType>Exe</OutputType>
+		<!-- Specify that it's an executable -->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="CEBuilders.fs" />
+		<Compile Include="ErrorHandlers.fs" />
+		<Compile Include="Helpers.fs" />
+		<Compile Include="ThothCoders.fs" />
+		<Compile Include="UsingThothJson.fs" />
+		<Compile Include="Program.fs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Giraffe" Version="7.0.2" />
+		<PackageReference Include="Saturn" Version="0.17.0" />
+		<PackageReference Include="Thoth.Json.Net" Version="12.0.0" />
+	</ItemGroup>
+
+</Project>
+*)

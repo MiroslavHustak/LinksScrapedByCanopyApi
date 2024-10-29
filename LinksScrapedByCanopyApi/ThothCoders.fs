@@ -12,6 +12,11 @@ type ResponseGet =
         Message : string
     } 
 
+type ResponsePut = 
+    {
+        Message : string
+    }
+
 module ThothCoders =   
 
     //**************** GET ********************
@@ -26,5 +31,9 @@ module ThothCoders =
     
     //**************** PUT ********************
 
-    let internal encoderPut (result : string) = Encode.string result   
+    let internal encoderPut (result : ResponsePut) = 
         
+        Encode.object
+            [
+                "Message", Encode.string result.Message    
+            ]
